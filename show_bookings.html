@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vis Bookinger</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchBookings() {
+            const response = await fetch('/show_bookings');
+            const bookings = await response.json();
+
+            const bookingsTable = document.getElementById('bookingsTable');
+            bookingsTable.innerHTML = '';
+
+            bookings.forEach((booking, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${booking.name}</td>
+                    <td>${booking.email}</td>
+                    <td>${booking.phone}</td>
+                    <td>${booking.date}</td>
+                    <td>${booking.direction}</td>
+                    <td>${booking.comment}</td>
+                    <td><button onclick="deleteBooking(${index})">Slett</button></td>
+                `;
+                bookingsTable.appendChild(row);
+            });
+        }
+
+        async function deleteBooking(index) {
+            const response = await fetch('/show_bookings', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ index })
+            });
+
+            if (response.ok) {
+                alert('Booking slettet');
+                fetchBookings(); // Oppdater listen etter sletting
+            } else {
+                alert('Feil ved sletting av booking');
+            }
+        }
+
+        window.onload = fetchBookings; // Hent bookinger når siden lastes
+    </script>
+</head>
+<body>
+    <h1>Vis Bookinger</h1>
+    <table id="bookingsTable">
+        <thead>
+            <tr>
+                <th>Navn</th>
+                <th>E-post</th>
+                <th>Telefon</th>
+                <th>Dato</th>
+                <th>Rute</th>
+                <th>Kommentar</th>
+                <th>Handling</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Bookingene vil bli fylt inn her av JavaScript -->
+        </tbody>
+    </table>
+</body>
+</html>
